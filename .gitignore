@@ -1,0 +1,29 @@
+# Archivos de entorno virtual
+venv/
+.venv/
+
+# Variables de entorno (NUNCA subir)
+.env
+
+# Archivos de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Archivos del IDE
+.vscode/
+.idea/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Archivos temporales
+*.tmp
+*.temp
