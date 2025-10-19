@@ -58,8 +58,12 @@ def registro():
     if request.method == 'POST':
         full_name = request.form.get('full_name')
         email = request.form.get('email')
+        country_code = request.form.get('country_code')
         phone = request.form.get('phone')
         password = request.form.get('password')
+
+        # Combinar código de país con número de teléfono
+        full_phone = country_code + phone if country_code and phone else phone
 
         response = supabase.table('Usuarios').select('id').eq('correo', email).execute()
         if response.data:
@@ -72,7 +76,7 @@ def registro():
             'id': str(uuid.uuid4()),
             'full_name': full_name,
             'correo': email,
-            'telefono': phone,
+            'telefono': full_phone,
             'password_hash': password_hash,
             'activo': True,
             'reporte_diario': True,
