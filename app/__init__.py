@@ -9,6 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import re
 import datetime
 import uuid
+import bcrypt
 
 load_dotenv()
 
@@ -21,6 +22,26 @@ key: str = os.environ.get("SUPABASE_KEY")
 if not url or not key:
     raise RuntimeError("SUPABASE_URL y SUPABASE_KEY deben estar definidos en el entorno")
 supabase: Client = create_client(url, key)
+
+# === FUNCIONES DE COMPATIBILIDAD DE CONTRASEÑAS ===
+def create_password_hash(password):
+    """Crea hash usando bcrypt (nuevo estándar)"""
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+def verify_password(password, hash_stored):
+    """Verifica contraseña con compatibilidad Werkzeug y bcrypt"""
+    # Detectar si es hash de bcrypt (empieza con $2b$)
+    if hash_stored.startswith('$2b$') or hash_stored.startswith('$2a$') or hash_stored.startswith('$2y$'):
+        try:
+            return bcrypt.checkpw(password.encode('utf-8'), hash_stored.encode('utf-8'))
+        except:
+            return False
+    else:
+        # Es hash de Werkzeug
+        try:
+            return check_password_hash(hash_stored, password)
+        except:
+            return False
 
 @app.route('/')
 def index():
@@ -45,7 +66,7 @@ def registro():
             flash('Este correo electrónico ya está registrado.', 'error')
             return redirect(url_for('registro'))
 
-        password_hash = generate_password_hash(password)
+        password_hash = create_password_hash(password)
 
         user_data = {
             'id': str(uuid.uuid4()),
@@ -107,7 +128,7 @@ def login():
         response = supabase.table('Usuarios').select('*').eq('correo', email).single().execute()
         user = response.data
 
-        if user and check_password_hash(user['password_hash'], password):
+        if user and verify_password(password, user['password_hash']):
             session['user_id'] = user['id']
             session['user_name'] = user['full_name']
             flash('Inicio de sesión exitoso.', 'success')
