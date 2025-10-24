@@ -1,0 +1,217 @@
+===============================================
+DOCUMENTACIÓN DEL BACKEND
+CV Interactivo con Asistente Financiero
+Autor: Adalberto Casteleiro Molina
+===============================================
+
+1. ARQUITECTURA DEL BACKEND
+===========================
+
+El backend está desarrollado con:
+- Python 3.13.2
+- Flask (Framework web minimalista)
+- Supabase (Base de datos PostgreSQL en la nube)
+- Werkzeug (Utilidades web y seguridad)
+- bcrypt (Encriptación de contraseñas)
+- python-dotenv (Manejo de variables de entorno)
+
+2. ESTRUCTURA DEL PROYECTO
+==========================
+
+flask_cv/
+├── app/
+│   ├── __init__.py          # Aplicación principal Flask
+│   ├── data.py             # Datos del CV profesional
+│   ├── static/             # Archivos estáticos
+│   │   ├── css/style.css   # Estilos personalizados
+│   │   └── js/app-funcional.js  # JavaScript funcional
+│   └── templates/          # Plantillas Jinja2
+│       ├── base.html       # Template base
+│       ├── index.html      # Página principal CV
+│       ├── asistente.html  # Formulario de registro
+│       ├── login.html      # Inicio de sesión
+│       ├── perfil.html     # Perfil de usuario
+│       └── registro.html   # Registro alternativo
+├── app.py                  # Punto de entrada de la aplicación
+├── requirements.txt        # Dependencias Python
+├── Procfile               # Configuración para deploy
+├── runtime.txt            # Versión de Python para hosting
+└── .env                   # Variables de entorno (no versionado)
+
+3. CONFIGURACIÓN DE LA APLICACIÓN FLASK
+=======================================
+
+3.1 Inicialización:
+- Carga de variables de entorno con dotenv
+- Configuración de clave secreta para sesiones
+- Conexión a Supabase con credenciales seguras
+- Manejo de errores de configuración
+
+3.2 Variables de Entorno Requeridas:
+- SUPABASE_URL: URL del proyecto Supabase
+- SUPABASE_KEY: Clave API de Supabase
+- SECRET_KEY: Clave secreta para sesiones Flask
+- PORT: Puerto para el despliegue (opcional)
+
+4. SISTEMA DE AUTENTICACIÓN
+===========================
+
+4.1 Gestión de Contraseñas:
+- Función create_password_hash(): Usa bcrypt para nuevas contraseñas
+- Función verify_password(): Compatibilidad con Werkzeug y bcrypt
+- Sistema híbrido para migración de contraseñas existentes
+
+4.2 Manejo de Sesiones:
+- Sesiones Flask para autenticación
+- Almacenamiento de user_id y user_name
+- Protección de rutas con decoradores implícitos
+
+5. RUTAS Y CONTROLADORES
+=======================
+
+5.1 Ruta Principal (/):
+- Renderiza index.html con datos del CV
+- Muestra experiencia, habilidades y proyectos
+- Acceso público sin autenticación
+
+5.2 Ruta Asistente (/asistente):
+- Formulario de registro para servicios financieros
+- Redirección a perfil si usuario ya autenticado
+- Procesamiento de códigos de país automático
+
+5.3 Ruta Registro (/registro):
+- Métodos GET y POST
+- Validación de email único
+- Encriptación de contraseña con bcrypt
+- Generación de UUID para identificadores únicos
+- Combinación automática de código país + teléfono
+
+5.4 Ruta Login (/login):
+- Verificación de credenciales
+- Sistema híbrido de verificación de contraseñas
+- Creación de sesión al autenticar exitosamente
+
+5.5 Ruta Perfil (/perfil):
+- Acceso solo para usuarios autenticados
+- Formateo de número telefónico para WhatsApp
+- Generación de enlace directo a WhatsApp
+
+5.6 Ruta Logout (/logout):
+- Limpieza de sesión de usuario
+- Redirección a página de asistente
+
+6. BASE DE DATOS SUPABASE
+========================
+
+6.1 Tabla Usuarios:
+Estructura:
+- id (UUID, Primary Key): Identificador único
+- full_name (TEXT): Nombre completo del usuario
+- correo (TEXT, UNIQUE): Email único del usuario
+- telefono (BIGINT): Teléfono con código de país
+- password_hash (TEXT): Contraseña encriptada
+- activo (BOOLEAN): Estado del usuario
+- reporte_diario (BOOLEAN): Suscripción a reportes diarios
+- reporte_semanal (BOOLEAN): Suscripción a reportes semanales
+- reporte_mensual (BOOLEAN): Suscripción a reportes mensuales
+- donante (BOOLEAN): Estado de donante
+- created_at (TIMESTAMP): Fecha de creación
+
+6.2 Operaciones de Base de Datos:
+- INSERT: Creación de nuevos usuarios
+- SELECT: Verificación de emails existentes y autenticación
+- Uso de Supabase Python Client para todas las operaciones
+
+7. SEGURIDAD IMPLEMENTADA
+========================
+
+7.1 Contraseñas:
+- Encriptación con bcrypt (más seguro que Werkzeug)
+- Salts únicos para cada contraseña
+- Sistema de compatibilidad backward para migración
+
+7.2 Sesiones:
+- Clave secreta robusta para firmar sesiones
+- Limpieza automática de sesiones al logout
+- Validación de sesión en rutas protegidas
+
+7.3 Validación de Datos:
+- Verificación de emails únicos antes de registro
+- Validación de formato de teléfono en frontend y backend
+- Manejo seguro de errores sin exposición de datos sensibles
+
+8. FUNCIONALIDADES ESPECÍFICAS
+==============================
+
+8.1 Procesamiento de Teléfonos:
+- Combinación automática de código de país + número local
+- Validación de formato (exactamente 10 dígitos)
+- Generación automática de enlaces de WhatsApp
+- Formateo para visualización con prefijo internacional
+
+8.2 Sistema de Mensajes Flash:
+- Mensajes de éxito y error para operaciones
+- Categorización por tipos (success, error, warning, info)
+- Visualización temporal con Bootstrap alerts
+
+8.3 Manejo de Errores:
+- Captura de errores de base de datos
+- Respuestas apropiadas para fallos de autenticación
+- Logs de errores para debugging
+
+9. DESPLIEGUE Y CONFIGURACIÓN
+============================
+
+9.1 Archivos de Configuración:
+- Procfile: Especifica comando de inicio con Gunicorn
+- runtime.txt: Define versión de Python (3.13.2)
+- requirements.txt: Lista todas las dependencias
+
+9.2 Variables de Entorno en Producción:
+- Configuración en EasyPanel/Heroku/Render
+- No inclusión de archivos .env en repositorio
+- Uso de .env.example para documentación
+
+10. DEPENDENCIAS PYTHON
+=======================
+
+- flask: Framework web principal
+- supabase: Cliente para base de datos Supabase
+- python-dotenv: Carga de variables de entorno
+- werkzeug: Utilidades web y compatibilidad de contraseñas
+- bcrypt: Encriptación moderna de contraseñas
+- gunicorn: Servidor WSGI para producción
+
+11. FLUJO DE DATOS TÍPICO
+========================
+
+11.1 Registro de Usuario:
+1. Usuario completa formulario en /asistente
+2. Backend valida email único en Supabase
+3. Se combina código de país + teléfono
+4. Contraseña se encripta con bcrypt
+5. Usuario se crea en base de datos
+6. Sesión se establece automáticamente
+7. Redirección a perfil de usuario
+
+11.2 Inicio de Sesión:
+1. Usuario envía credenciales en /login
+2. Backend busca usuario por email en Supabase
+3. Verificación de contraseña (bcrypt o Werkzeug)
+4. Creación de sesión si credenciales válidas
+5. Redirección a perfil personalizado
+
+12. OPTIMIZACIONES DE RENDIMIENTO
+================================
+
+12.1 Base de Datos:
+- Consultas específicas con select() solo de campos necesarios
+- Índices automáticos en campos únicos (email)
+- Conexión reutilizable con Supabase client
+
+12.2 Aplicación:
+- Carga lazy de templates con Jinja2
+- Archivos estáticos servidos eficientemente
+- Compresión automática en producción con Gunicorn
+
+El backend está diseñado para ser escalable, seguro y mantenible, siguiendo las mejores prácticas de desarrollo con Flask y arquitectura moderna de microservicios con Supabase.

@@ -1,0 +1,59 @@
+Frontend - Documentación (Resumen)
+
+Objetivo
+--------
+Integrar caja de comentarios de Facebook en la página principal del CV y añadir utilidades en JavaScript escritas con un estilo funcional.
+
+Archivos relevantes (frontend)
+-----------------------------
+- `app/templates/base.html`  -> carga condicional del SDK de Facebook si está configurado `FB_APP_ID`.
+- `app/templates/index.html` -> sección "Comentarios" añadida con el plugin `fb-comments`.
+- `app/static/js/app-funcional.js` -> script con utilidades en estilo funcional: find, filter, map, reduce, validación y formateo de teléfono, carga perezosa del SDK de Facebook.
+- `app/static/css/style.css`  -> estilos generales (existente en el proyecto).
+
+Principales funciones del JS (programación funcional)
+----------------------------------------------------
+- `encontrarPaisPorCodigo(codigo)` -> usa `find` para localizar país.
+- `filtrarPaisesAmericanos()` -> usa `filter` para obtener países de la región.
+- `mapearPaisesAOpciones()` -> usa `map` para transformar a opciones de select.
+- `validarTelefono(telefono)` -> valida que sean 10 dígitos numéricos.
+- `formatearTelefonoCompleto(codigoPais, numeroLocal)` -> combina código y número y devuelve URL de WhatsApp.
+- Inicializadores DOM: el script inicializa selectores si existen y agrega validación/prevención en submit.
+
+Integración Facebook (resumen técnico frontend)
+-----------------------------------------------
+1. El SDK de Facebook se carga condicionalmente en `base.html` solo si `FB_APP_ID` está definido. Esto evita errores en entornos sin configuración.
+2. En `index.html` añadimos:
+   <div class="fb-comments" data-href="{{ PUBLIC_URL }}{{ request.path }}" data-width="100%" data-numposts="5"></div>
+   - `data-href` usa la variable `PUBLIC_URL` + la ruta actual (`request.path`) para tener un identificador único por página.
+3. El script `app-funcional.js` incluye la función `loadFacebookSDK(appId, locale)` para cargar el SDK perezosamente (si se desea manipularlo manualmente).
+
+Pruebas recomendadas (frontend)
+-------------------------------
+- Confirmar que `FB_APP_ID` esté configurado en el entorno (EasyPanel) y que `PUBLIC_URL` apunte a la URL pública del sitio.
+- Abrir la página principal y verificar que la caja de comentarios aparece y carga el plugin.
+- Probar publicación de un comentario (requiere estar logueado en Facebook).
+- Probar en mobile y desktop (responsive).
+
+Notas de seguridad y privacidad
+------------------------------
+- No subir el archivo `.env` con credenciales a GitHub.
+- Revisar permisos del App de Facebook y limitar dominios permitidos.
+
+Evidencias a recoger (frontend)
+--------------------------------
+- Captura de pantalla de `index.html` con los comentarios visibles.
+- Captura de Facebook Developers mostrando App ID y dominios.
+- Video corto (<=2min) mostrando la publicación de un comentario desde desktop y móvil.
+
+Instrucciones rápidas para producir PDF final
+--------------------------------------------
+1. Compilar todas las capturas y la documentación (este archivo + backend.txt) en un documento (Word/Google Docs).
+2. Exportar a PDF.
+
+Repositorio actual:
+https://github.com/AdalCast/flask-cv-interactivo
+
+Live URL (configurar `PUBLIC_URL` en EasyPanel con tu dominio):
+- (ejemplo) https://tu-cv.su-dominio.com
+

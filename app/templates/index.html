@@ -78,5 +78,13 @@
     </ul>
 </div>
 
+<!-- Facebook Comments: coloca aquí la caja de comentarios para el CV -->
+<div class="container px-4 py-5">
+    <h3 class="pb-2 border-bottom text-center mb-4">Comentarios</h3>
+    <div class="mx-auto" style="max-width:900px;">
+        {# data-href usa PUBLIC_URL + ruta actual para que cada página tenga su propia URL única #}
+        <div class="fb-comments" data-href="{{ PUBLIC_URL }}{{ request.path }}" data-width="100%" data-numposts="5"></div>
+    </div>
+</div>
+
 {% endblock %}
-set FLASK_APP=app

@@ -16,6 +16,16 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', os.urandom(24))
 
+# Opcionales: App ID de Facebook y URL pública (útil para Facebook Comments)
+app.config['FB_APP_ID'] = os.environ.get('FB_APP_ID', '')
+app.config['PUBLIC_URL'] = os.environ.get('PUBLIC_URL', 'http://127.0.0.1:5000')
+
+
+@app.context_processor
+def inject_globals():
+    """Inyecta variables globales en las plantillas: FB_APP_ID y PUBLIC_URL."""
+    return dict(FB_APP_ID=app.config.get('FB_APP_ID', ''), PUBLIC_URL=app.config.get('PUBLIC_URL', 'http://127.0.0.1:5000'))
+
 # Configuración de Supabase
 url: str = os.environ.get("SUPABASE_URL")
 key: str = os.environ.get("SUPABASE_KEY")

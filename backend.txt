@@ -1,0 +1,93 @@
+Backend - Documentación (Resumen)
+
+Objetivo
+--------
+Documentar la infraestructura backend de la aplicación Flask y explicar los pasos para configurar Facebook Comments desde el lado servidor y del panel de hosting.
+
+Arquitectura y tecnologías
+-------------------------
+- Backend: Flask (Python)
+- Base de datos: Supabase (Postgres)
+- Autenticación: manejo de sesiones con Flask y contraseñas encriptadas con bcrypt
+- Hosting: EasyPanel en Hostinger (deploy automático desde GitHub)
+- WSGI: gunicorn (usado en producción)
+
+Estructura de carpetas (resumen)
+--------------------------------
+- `app/` - código de la aplicación
+  - `__init__.py` - inicialización de Flask, rutas y configuración
+  - `templates/` - plantillas Jinja2 (base.html, index.html, perfil.html, etc.)
+  - `static/` - css, js, imágenes
+- `app.py` - entrypoint para ejecutar la app
+- `requirements.txt` - dependencias de Python
+- `Procfile`, `runtime.txt` - configuración para despliegue (Heroku / similares)
+
+Dependencias principales
+------------------------
+- flask
+- supabase
+- python-dotenv
+- werkzeug
+- bcrypt
+- gunicorn
+
+Configuraciones específicas añadidas
+-----------------------------------
+- Variables de entorno importantes:
+  - SUPABASE_URL, SUPABASE_KEY
+  - SECRET_KEY
+  - FB_APP_ID (ID de la App de Facebook)
+  - PUBLIC_URL (URL pública del sitio, ej: https://mi-cv.example.com)
+
+Inyección en plantillas
+-----------------------
+Se añadió un `context_processor` en `app/__init__.py` para exponer `FB_APP_ID` y `PUBLIC_URL` en todas las plantillas:
+
+@app.context_processor
+def inject_globals():
+    return dict(FB_APP_ID=app.config.get('FB_APP_ID',''), PUBLIC_URL=app.config.get('PUBLIC_URL','http://127.0.0.1:5000'))
+
+Esto permite usar `{{ FB_APP_ID }}` y `{{ PUBLIC_URL }}` desde Jinja2.
+
+Pasos para configurar Facebook (Backend / Hosting)
+-------------------------------------------------
+1. Crear una App en https://developers.facebook.com
+   - Tipo: "Negocio" o "Consumer" según prefieras.
+2. Obtener el App ID desde el dashboard de la App.
+3. En Configuración > Básico:
+   - Añadir el dominio público (ej: tu-cv.example.com) en "App Domains".
+   - En "Add Platform" agregar "Website" y establecer el Site URL (ej: https://tu-cv.example.com)
+4. Activar el producto "Comments" si aplica o simplemente cargar el SDK y usar plugin XFBML.
+5. En tu hosting (EasyPanel) añadir variables de entorno:
+   - `FB_APP_ID` = <tu-app-id>
+   - `PUBLIC_URL` = https://tu-cv.example.com
+6. Forzar redeploy para aplicar las variables y verificar que `base.html` cargue el SDK.
+
+CORS / dominios y pruebas locales
+--------------------------------
+- Para desarrollo local, agrega `http://localhost:5000` o `http://127.0.0.1:5000` como dominio de prueba en Facebook Developers.
+- Facebook Comments funciona mejor cuando la URL pública en `data-href` coincide con el dominio configurado en la app.
+
+Logs y debugging
+----------------
+- Verificar los logs del servidor (EasyPanel) si el SDK no carga.
+- Revisar la consola del navegador para errores relacionados con Facebook (por ejemplo: dominio no permitido).
+
+Evidencias a recopilar (backend)
+--------------------------------
+- `git ls-tree -r --name-only HEAD` (listado de archivos del proyecto)
+- Fragmentos de `app/__init__.py` mostrando `context_processor` y rutas relevantes
+- Capturas de pantalla de la sección de variables de entorno en EasyPanel
+- Logs del servidor mostrando la carga correcta
+
+Despliegue y repositorio
+------------------------
+- Repositorio (actual): https://github.com/AdalCast/flask-cv-interactivo
+- Para hacer deploy en otro hosting: clonar, configurar variables de entorno y ejecutar con gunicorn
+
+Recomendaciones finales
+-----------------------
+- Mantener `FB_APP_ID` y `SUPABASE_KEY` fuera del repositorio (usar variables de entorno en EasyPanel).
+- Usar `PUBLIC_URL` para asegurar que `data-href` de los comentarios apunte a la URL final.
+- Probar publicación de comentarios como usuario de Facebook real (privado) para validar que se muestran.
+
