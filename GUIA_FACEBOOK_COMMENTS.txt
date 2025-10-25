@@ -1,0 +1,112 @@
+GUÍA PASO A PASO: Configurar Facebook Comments
+
+═══════════════════════════════════════════════════════════════════
+PASO 1: CREAR APP EN FACEBOOK DEVELOPERS
+═══════════════════════════════════════════════════════════════════
+
+1. Ve a: https://developers.facebook.com/apps/
+
+2. Click en "Create App" o "Crear aplicación"
+
+3. Selecciona:
+   - Tipo: "Other" (Otro) o "Consumer"
+   - Click "Next"
+
+4. Completa la información:
+   - App Name: "CV Adalberto Casteleiro" (o el nombre que prefieras)
+   - App Contact Email: tu email
+   - Click "Create App"
+
+5. Confirma tu cuenta (te pedirá contraseña de Facebook)
+
+═══════════════════════════════════════════════════════════════════
+PASO 2: OBTENER APP ID
+═══════════════════════════════════════════════════════════════════
+
+1. Una vez creada la app, verás el Dashboard
+2. En la parte superior verás: "App ID: 1234567890123456"
+3. COPIA ese número (es tu FB_APP_ID)
+
+═══════════════════════════════════════════════════════════════════
+PASO 3: CONFIGURAR DOMINIOS
+═══════════════════════════════════════════════════════════════════
+
+1. En el menú lateral, ve a: "Settings" > "Basic"
+
+2. Scroll hacia abajo hasta "App Domains"
+   - Para desarrollo local: localhost
+   - Para producción: tu-dominio.com (sin https://)
+
+3. Más abajo en "Add Platform":
+   - Click "Add Platform"
+   - Selecciona "Website"
+   - Site URL: 
+     * Local: http://localhost:5000
+     * Producción: https://tu-dominio.com
+
+4. Click "Save Changes"
+
+═══════════════════════════════════════════════════════════════════
+PASO 4: CONFIGURAR EN EASYPANEL (PRODUCCIÓN)
+═══════════════════════════════════════════════════════════════════
+
+1. Ve a EasyPanel
+2. Abre tu aplicación "cv_app"
+3. Ve a "Environment Variables"
+4. Agrega estas variables:
+
+   Variable Name: FB_APP_ID
+   Value: [pega tu App ID aquí, ej: 1234567890123456]
+
+   Variable Name: PUBLIC_URL
+   Value: [tu URL completa, ej: https://cv.tu-dominio.com]
+
+5. Click "Save"
+6. Click "Redeploy" o "Restart"
+
+═══════════════════════════════════════════════════════════════════
+PASO 5: PROBAR LOCALMENTE (OPCIONAL)
+═══════════════════════════════════════════════════════════════════
+
+1. Crea/edita archivo .env en tu proyecto:
+   
+   FB_APP_ID=tu_app_id_aqui
+   PUBLIC_URL=http://localhost:5000
+
+2. Reinicia el servidor: python app.py
+
+3. Ve a: http://localhost:5000/
+
+4. Deberías ver la caja de comentarios de Facebook
+
+═══════════════════════════════════════════════════════════════════
+VERIFICACIÓN
+═══════════════════════════════════════════════════════════════════
+
+✓ App creada en Facebook Developers
+✓ App ID copiado
+✓ Dominios configurados (localhost + producción)
+✓ Variables en EasyPanel configuradas
+✓ Aplicación reiniciada
+
+IMPORTANTE:
+- Para comentar necesitas estar logueado en Facebook
+- Los comentarios son públicos
+- Puedes moderar comentarios desde el panel de Facebook
+
+═══════════════════════════════════════════════════════════════════
+TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════
+
+Si no funciona:
+1. Verifica que FB_APP_ID esté en EasyPanel
+2. Verifica que PUBLIC_URL coincida con tu dominio real
+3. Abre consola del navegador (F12) y busca errores
+4. Verifica que el dominio esté en App Domains de Facebook
+
+Errores comunes:
+- "Given URL is not allowed": Dominio no configurado en Facebook
+- No aparece la caja: FB_APP_ID no configurado o incorrecto
+- "Can't Load Plugin": Problema de red o App ID inválido
+
+═══════════════════════════════════════════════════════════════════
